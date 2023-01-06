@@ -3,8 +3,7 @@ class Api::V1::TransactionsController < ApplicationController
 
   # Displays all transactions
   def index
-    transactions = Services::GetTransactions.call
-    render json: { errors: [], rows: transactions }
+    render json: { errors: [], rows: Services::GetTransactions.call }
   end
 
   # Displays all transactions of a particular customer
@@ -15,21 +14,25 @@ class Api::V1::TransactionsController < ApplicationController
 
   # Displays a specific transaction by id
   def show
-    transaction = Transaction.single_record(@transaction.id)
-    logger.info "Transaction in show :: #{transaction.inspect}"
-    render json: { resp_code: SUCCESS_CODE, resp_desc: transaction }
+    render json: { resp_code: SUCCESS_CODE, resp_desc: Transaction.single_record(@transaction.id) }
   end
 
   # Creates a transaction
   def create
     @transaction = Transaction.new(transaction_params)
-    @transaction.transaction_id = Transaction.trans_generator
-    @transaction.is_active = true
     if @transaction.save
-      transaction = Transaction.single_record(@transaction.id)
-      render json: {resp_code: SUCCESS_CODE, resp_desc: transaction }
+      render json: {resp_code: SUCCESS_CODE, resp_desc: Transaction.single_record(@transaction.id) }
     else
       render json: {resp_code: FAIL_CODE, resp_desc: Utils.errors(@transaction)}
+    end
+  end
+
+  # Update a transaction
+  def update
+    if @transaction.update(transaction_params)
+      render json: {resp_code: SUCCESS_CODE, resp_desc: Transaction.single_record(@transaction.id) }
+    else
+      render json: { resp_code: FAIL_CODE, resp_desc: Utils.errors(@transaction) }
     end
   end
 
@@ -37,6 +40,8 @@ class Api::V1::TransactionsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_transactions
     @transaction = Transaction.find(params[:id])
+  rescue ActiveRecord::RecordNotFound => e
+    render json: {resp_code: FAIL_CODE, resp_desc: e }
   end
 
   def transaction_params
