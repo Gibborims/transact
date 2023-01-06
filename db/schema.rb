@@ -24,19 +24,19 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_21_113428) do
     t.decimal "height"
     t.string "location"
     t.text "comment"
-    t.boolean "is_active"
+    t.boolean "is_active", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "customer_id"
+    t.integer "customer_id"
     t.decimal "input_amt", precision: 10, scale: 2
     t.string "input_currency"
     t.decimal "output_amt", precision: 10, scale: 2
     t.string "output_currency"
     t.text "comment"
-    t.boolean "is_active"
+    t.boolean "is_active", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

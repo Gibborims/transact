@@ -9,7 +9,7 @@ class CreateCustomers < ActiveRecord::Migration[7.0]
       t.decimal :height
       t.string :location
       t.text :comment
-      t.boolean :is_active
+      t.boolean :is_active, default: true
 
       t.timestamps
     end
